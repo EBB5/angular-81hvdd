@@ -72,9 +72,50 @@ export class DatepickerViewsSelectionExample {
     ctrlValue.month(normalizedMonth.month());
     fc.setValue(ctrlValue);
     datepicker.close();
-    if (this.dateFrom.value > this.dateTo.value) {
-      this.dateTo.setValue(this.dateFrom.value);
+    if (fc == this.dateFrom) {
+      this.syncSrcAndTrgtDate(fc, this.dateTo, true);
+    } else {
+      this.syncSrcAndTrgtDate(this.dateFrom, fc, false);
     }
+  }
+
+  ondateFromChange(searchValue: string): void {
+    console.log(`From text change: ${searchValue}`);
+    this.syncSrcAndTrgtDate(this.dateFrom, this.dateTo, true);
+  }
+
+  ondateToChange(searchValue: string): void {
+    console.log(searchValue);
+    this.syncSrcAndTrgtDate(this.dateFrom, this.dateTo, false);
+  }
+
+  syncSrcAndTrgtDate(
+    srcControl: FormControl,
+    trgtControl: FormControl,
+    syncTrgt: boolean
+  ): void {
+    console.log(`Source control: ${srcControl.value}`);
+    console.log(`Target control: ${trgtControl.value}`);
+
+    if (srcControl.value > trgtControl.value) {
+      console.log('src > trgt');
+      if (syncTrgt) {
+        if (this.isValidDate(srcControl)) {
+          console.log('sync target');
+          trgtControl.setValue(srcControl.value);
+        }
+      } else {
+        if (this.isValidDate(trgtControl)) {
+          srcControl.setValue(trgtControl.value);
+        }
+      }
+    }
+  }
+  isValidDate(control: FormControl): boolean {
+    var validStartDate = moment('01/01/1900', 'DD/MM/YYYY');
+    var validEndDate = moment('01/01/2099', 'DD/MM/YYYY');
+
+    return control.value.isBetween(validStartDate, validEndDate);
   }
 }
 
