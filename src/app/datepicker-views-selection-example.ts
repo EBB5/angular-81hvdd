@@ -108,12 +108,14 @@ export class DatepickerViewsSelectionExample {
         if (this.isValidDate(srcControl)) {
           console.log('sync target');
           const trgtValue = trgtControl.value;
-          trgtValue.set(srcControl.value);
+          trgtValue.set(srcControl.value.toObject());
+          trgtControl.setValue(trgtValue);
         }
       } else {
         if (this.isValidDate(trgtControl)) {
           const srcValue = srcControl.value;
-          srcValue.set(trgtControl.value);
+          srcValue.set(trgtControl.value.toObject());
+          srcControl.setValue(srcValue);
         }
       }
     }
