@@ -58,6 +58,9 @@ export class DatepickerViewsSelectionExample {
   dateTo = new FormControl(moment());
 
   chosenYearHandler(normalizedYear: Moment, fc: FormControl) {
+    if (fc == this.dateFrom) {
+      console.log('update on from date for year');
+    }
     const ctrlValue = fc.value;
     ctrlValue.year(normalizedYear.year());
     fc.setValue(ctrlValue);
@@ -73,8 +76,10 @@ export class DatepickerViewsSelectionExample {
     fc.setValue(ctrlValue);
     datepicker.close();
     if (fc == this.dateFrom) {
+      console.log('update on from date');
       this.syncSrcAndTrgtDate(fc, this.dateTo, true);
     } else {
+      console.log('update on to date');
       this.syncSrcAndTrgtDate(this.dateFrom, fc, false);
     }
   }
@@ -102,11 +107,13 @@ export class DatepickerViewsSelectionExample {
       if (syncTrgt) {
         if (this.isValidDate(srcControl)) {
           console.log('sync target');
-          trgtControl.setValue(srcControl.value);
+          const trgtValue = trgtControl.value;
+          trgtValue.set(srcControl.value);
         }
       } else {
         if (this.isValidDate(trgtControl)) {
-          srcControl.setValue(trgtControl.value);
+          const srcValue = srcControl.value;
+          srcValue.set(trgtControl.value);
         }
       }
     }
