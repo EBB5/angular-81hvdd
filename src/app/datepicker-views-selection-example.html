@@ -10,7 +10,7 @@
   <mat-datepicker
     #dpFrom
     startView="multi-year"
-    (yearSelected)="chosenYearHandler($event)"
+    (yearSelected)="chosenYearHandler($event, dateFrom)"
     (monthSelected)="chosenMonthHandler($event, dpFrom, dateFrom)"
     panelClass="example-month-picker"
   >
@@ -28,7 +28,7 @@
   <mat-datepicker
     #dpTo
     startView="multi-year"
-    (yearSelected)="chosenYearHandler($event)"
+    (yearSelected)="chosenYearHandler($event, dateTo)"
     (monthSelected)="chosenMonthHandler($event, dpTo, dateTo)"
     panelClass="example-month-picker"
   >

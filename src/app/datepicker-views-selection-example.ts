@@ -57,10 +57,10 @@ export class DatepickerViewsSelectionExample {
   dateFrom = new FormControl(moment());
   dateTo = new FormControl(moment());
 
-  chosenYearHandler(normalizedYear: Moment) {
-    const ctrlValue = this.dateFrom.value;
+  chosenYearHandler(normalizedYear: Moment, fc: FormControl) {
+    const ctrlValue = fc.value;
     ctrlValue.year(normalizedYear.year());
-    this.dateFrom.setValue(ctrlValue);
+    fc.setValue(ctrlValue);
   }
 
   chosenMonthHandler(
