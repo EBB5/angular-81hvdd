@@ -9,7 +9,7 @@ import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {DemoMaterialModule} from './app/material-module';
 
-import {DatepickerViewsSelectionExample} from './app/datepicker-views-selection-example';
+import {DatepickerViewsSelectionExample} from './app/datepicker-range';
 
 @NgModule({
   imports: [

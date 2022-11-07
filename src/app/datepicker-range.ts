@@ -53,7 +53,7 @@ export const MY_FORMATS = {
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ],
 })
-export class DatepickerViewsSelectionExample {
+export class DatepickerRange {
   dateFrom = new FormControl(moment());
   dateTo = new FormControl(moment());
 
@@ -132,6 +132,21 @@ export class DatepickerViewsSelectionExample {
 
     return control.value.isBetween(validStartDate, validEndDate);
   }
+
+  getFromDate(truncToFirstDay: boolean): Date {
+    let resultDate: Date = this.dateFrom.value.toDate();
+    resultDate.setMilliseconds(0);
+    resultDate.setSeconds(0);
+    resultDate.setMinutes(0);
+    resultDate.setHours(0);
+    if (truncToFirstDay) {
+      resultDate.setDate(1);
+    }
+    //console.log(resultDate);
+
+    return resultDate;
+  }
+
 }
 
 /**  Copyright 2019 Google LLC. All Rights Reserved.
