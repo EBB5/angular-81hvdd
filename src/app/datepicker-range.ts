@@ -18,6 +18,8 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import { default as _rollupMoment, Moment } from 'moment';
+import { config } from 'rxjs';
+import { DatepickerRangeConfig } from './datepicker-range-config';
 
 const moment = _rollupMoment || _moment;
 
@@ -141,7 +143,7 @@ export class DatepickerRange {
     return this.getDateFromControl(this.dateTo, true);
   }
 
-  getDateFromControl(fc: FormControl, truncToFirstDay: boolean) {
+  private getDateFromControl(fc: FormControl, truncToFirstDay: boolean) {
     let resultDate: Date = fc.value.toDate();
     resultDate.setMilliseconds(0);
     resultDate.setSeconds(0);
@@ -158,6 +160,31 @@ export class DatepickerRange {
     console.log(resultDate);
 
     return resultDate;
+  }
+  /** 
+   * Retrieve existing config from the session storage and add/update the config for the component name.
+   * @filterForComponentName: Source component where the datepicker component is used on
+   * @truncToFirstDay: Indicates that the day needs to be set to the first day of the month
+   * @purpose: specific use of the date range component on the source component (filter for CreationDate, ModifiedDate, ...)
+   */
+  storeDatesToStorage(filterForComponentName: string, truncToFirstDay: boolean, purpose: string): void {
+    let configItems: DatepickerRangeConfig[] = [];
+    let configItemsStorageJson = sessionStorage.getItem(`date-range-config-${filterForComponentName}`)
+    if(!configItemsStorageJson) {
+      const configItem: DatepickerRangeConfig = new DatepickerRangeConfig();
+      configItem.purpose = purpose;
+      configItem.dateFrom = this.getFromDate(truncToFirstDay);
+      configItem.dateTo = this.getToDate(truncToFirstDay);
+      configItems.push(configItem);
+    }
+    else {
+      //search the item with the specific purpose
+      configItems = JSON.parse(configItemsStorageJson);
+
+    }
+
+    configItemsStorageJson = JSON.stringify(configItems);
+    sessionStorage.setItem(`date-range-config-${filterForComponentName}`, configItemsStorageJson);
   }
 }
 
