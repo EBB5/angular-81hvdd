@@ -37,9 +37,9 @@ export const MY_FORMATS = {
 
 /** @title Datepicker emulating a Year and month picker */
 @Component({
-  selector: 'datepicker-views-selection-example',
-  templateUrl: 'datepicker-views-selection-example.html',
-  styleUrls: ['datepicker-views-selection-example.css'],
+  selector: 'datepicker-range',
+  templateUrl: 'datepicker-range.html',
+  styleUrls: ['datepicker-range.css'],
   providers: [
     // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
     // application's root module. We provide it at the component level here, due to limitations of
@@ -134,6 +134,14 @@ export class DatepickerRange {
   }
 
   getFromDate(truncToFirstDay: boolean): Date {
+    return this.getDateFromControl(this.dateFrom, true);
+  }
+
+  getToDate(truncToFirstDay: boolean): Date {
+    return this.getDateFromControl(this.dateFrom, true);
+  }
+
+  getDateFromControl(fc: FormControl, truncToFirstDay: boolean) {
     let resultDate: Date = this.dateFrom.value.toDate();
     resultDate.setMilliseconds(0);
     resultDate.setSeconds(0);
@@ -142,11 +150,15 @@ export class DatepickerRange {
     if (truncToFirstDay) {
       resultDate.setDate(1);
     }
-    //console.log(resultDate);
+    const timeZoneDifference = (resultDate.getTimezoneOffset() / 60) * -1;
+    resultDate.setTime(
+      resultDate.getTime() + timeZoneDifference * 60 * 60 * 1000
+    );
+
+    console.log(resultDate);
 
     return resultDate;
   }
-
 }
 
 /**  Copyright 2019 Google LLC. All Rights Reserved.
