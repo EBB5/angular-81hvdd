@@ -84,14 +84,20 @@ export class DatepickerViewsSelectionExample {
     }
   }
 
-  ondateFromChange(searchValue: string): void {
-    console.log(`From text change: ${searchValue}`);
-    this.syncSrcAndTrgtDate(this.dateFrom, this.dateTo, true);
+  ondateFromChange(searchValueEvent: Event | null): void {
+    if (searchValueEvent) {
+      const searchValue = searchValueEvent.target as HTMLInputElement;
+      console.log(`From text change: ${searchValue.value}`);
+      this.syncSrcAndTrgtDate(this.dateFrom, this.dateTo, true);
+    }
   }
 
-  ondateToChange(searchValue: string): void {
-    console.log(searchValue);
-    this.syncSrcAndTrgtDate(this.dateFrom, this.dateTo, false);
+  ondateToChange(searchValueEvent: Event | null): void {
+    if (searchValueEvent) {
+      const searchValue = searchValueEvent.target as HTMLInputElement;
+      console.log(searchValue.value);
+      this.syncSrcAndTrgtDate(this.dateFrom, this.dateTo, false);
+    }
   }
 
   syncSrcAndTrgtDate(

@@ -4,7 +4,7 @@
     [matDatepicker]="dpFrom"
     placeholder="From Month/Year"
     [formControl]="dateFrom"
-    (change)="ondateFromChange($event.target.value)"
+    (change)="ondateFromChange($event)"
   />
   <mat-datepicker-toggle matSuffix [for]="dpFrom"></mat-datepicker-toggle>
   <mat-datepicker
@@ -22,7 +22,7 @@
     [matDatepicker]="dpTo"
     placeholder="To Month/Year"
     [formControl]="dateTo"
-    (change)="ondateToChange($event.target.value)"
+    (change)="ondateToChange($event)"
   />
   <mat-datepicker-toggle matSuffix [for]="dpTo"></mat-datepicker-toggle>
   <mat-datepicker
