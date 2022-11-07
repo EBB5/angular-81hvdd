@@ -138,11 +138,11 @@ export class DatepickerRange {
   }
 
   getToDate(truncToFirstDay: boolean): Date {
-    return this.getDateFromControl(this.dateFrom, true);
+    return this.getDateFromControl(this.dateTo, true);
   }
 
   getDateFromControl(fc: FormControl, truncToFirstDay: boolean) {
-    let resultDate: Date = this.dateFrom.value.toDate();
+    let resultDate: Date = fc.value.toDate();
     resultDate.setMilliseconds(0);
     resultDate.setSeconds(0);
     resultDate.setMinutes(0);
