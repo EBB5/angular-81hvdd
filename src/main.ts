@@ -3,13 +3,14 @@ import './polyfills';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatNativeDateModule } from '@angular/material/core';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DemoMaterialModule } from './app/material-module';
 
-import { DatepickerRange } from './app/datepicker-range';
+import { DatepickerRangeComponent } from './app/datepicker-range.component';
+import {MAT_MOMENT_DATE_FORMATS, MomentDateAdapter} from '@angular/material-moment-adapter';
 
 @NgModule({
   imports: [
@@ -21,10 +22,13 @@ import { DatepickerRange } from './app/datepicker-range';
     MatNativeDateModule,
     ReactiveFormsModule,
   ],
-  entryComponents: [DatepickerRange],
-  declarations: [DatepickerRange],
-  bootstrap: [DatepickerRange],
-  providers: [],
+  entryComponents: [DatepickerRangeComponent],
+  declarations: [DatepickerRangeComponent],
+  bootstrap: [DatepickerRangeComponent],
+  providers: [
+    {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
+    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},
+  ],
 })
 export class AppModule {}
 

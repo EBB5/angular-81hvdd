@@ -1,5 +1,4 @@
-export class DatepickerRangeConfig {
-  purpose: string;
+export interface DatepickerRangeConfig {
   dateFrom: Date;
   dateTo: Date;
 }

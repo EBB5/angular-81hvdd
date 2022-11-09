@@ -1,8 +1,13 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "module": "esNext",
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": [],
+    "lib": [
+      "esNext",
+      "dom"
+    ]
   },
   "files": [
     "src/main.ts",

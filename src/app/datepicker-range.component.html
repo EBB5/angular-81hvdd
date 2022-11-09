@@ -1,0 +1,46 @@
+<mat-form-field *ngIf="filterOn.length > 1">
+  <mat-label>Filter on:</mat-label>
+  <mat-select [(value)]="selectedFilter" (selectionChange)="onFilterOnChange($event)">
+    <mat-option [value]="filter.value" *ngFor="let filter of filterOn" >
+      {{filter.viewValue}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<mat-form-field>
+  <input
+    matInput
+    [matDatepicker]="dpFrom"
+    placeholder="From"
+    [formControl]="dateFrom"
+    (dateChange)="onDateFromChange($event)"
+  />
+  <mat-datepicker-toggle matSuffix [for]="dpFrom"></mat-datepicker-toggle>
+  <mat-datepicker
+    #dpFrom
+    startView="{{ this.selectedFilterObj.calendarStartView }}"
+    (yearSelected)="chosenYearHandler($event, dateFrom)"
+    (monthSelected)="chosenMonthHandler($event, dpFrom, dateFrom)"
+    panelClass="example-month-picker"
+  >
+  </mat-datepicker>
+</mat-form-field>
+<mat-form-field>
+  <input
+    matInput
+    [matDatepicker]="dpTo"
+    placeholder="To"
+    [formControl]="dateTo"
+    (dateChange)="onDateToChange($event)"
+  />
+  <mat-datepicker-toggle matSuffix [for]="dpTo"></mat-datepicker-toggle>
+  <mat-datepicker
+    #dpTo
+    startView="{{ this.selectedFilterObj.calendarStartView }}"
+    (yearSelected)="chosenYearHandler($event, dateTo)"
+    (monthSelected)="chosenMonthHandler($event, dpTo, dateTo)"
+    panelClass="example-month-picker"
+  >
+  </mat-datepicker>
+</mat-form-field>
+
+
