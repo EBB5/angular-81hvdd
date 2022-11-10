@@ -1,9 +1,17 @@
-.example-month-picker .mat-calendar-period-button {
+.month-picker .mat-calendar-period-button {
   pointer-events: none;
 }
 
-.example-month-picker .mat-calendar-arrow {
+.month-picker .mat-calendar-arrow {
   display: none;
+}
+
+.mat-raised-button {
+  margin-left: 20px;
+}
+
+.filter-on {
+  margin-right: 20px;
 }
 
 .mat-form-field {

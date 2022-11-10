@@ -1,33 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 
-// Depending on whether rollup is used, moment needs to be imported differently.
-// Since Moment.js doesn't have a default export, we normally need to import using the `* as`
-// syntax. However, rollup creates a synthetic default module, and we thus need to import it using
-// the `default as` syntax.
-import * as _moment from 'moment';
-// tslint:disable-next-line:no-duplicate-imports
-import {  Moment } from 'moment';
 import { DatepickerRangeConfig } from './datepicker-range-config';
 import {DatepickerRangePurpose} from './datepicker-range-purpose';
 import {MatSelectChange} from '@angular/material/select';
-
-const moment = _moment;
-
-// See the Moment.js docs for the meaning of these formats:
-// https://momentjs.com/docs/#/displaying/format/
-export const MY_FORMATS = {
-  parse: {
-    dateInput: 'MM/YYYY',
-  },
-  display: {
-    dateInput: 'MM/YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
+import {Moment} from 'moment';
 
 /** @title Datepicker emulating a Year and month picker */
 @Component({
@@ -44,70 +22,76 @@ export class DatepickerRangeComponent implements OnInit {
     {value: 'default', viewValue: 'Default', calendarStartView: 'multi-year'},
     {value: 'modified', viewValue: 'Date Modified', calendarStartView: 'month'}
   ];
+  @Output() newDateRangeEvent = new EventEmitter<DatepickerRangeConfig>();
 
 
-  dateFrom = new FormControl(moment());
-  dateTo = new FormControl(moment());
+  dateFrom = new FormControl(new Date());
+  dateTo = new FormControl(new Date());
   selectedFilter: string | undefined;
   selectedFilterObj: DatepickerRangePurpose | undefined;
   private truncToFirstDay: boolean;
 
   /**
-   * Converts the moment value of a control to a normal Date object
-   * @param fc Formcontrol
+   * Converts the Date value of a control to a normalized Date
+   * @param controlDate Formcontrol date
    * @param truncToFirstDay Indicates that the day part needs to be put on the first day of the month
    */
-  private static getDateFromControl(fc: FormControl, truncToFirstDay: boolean): Moment {
-    let resultDate: Moment = fc.value.set({'hour': 0, 'minute': 0, 'second': 0, 'milisecond': 0});
+  private static normalizeDateFromControl(controlDate: Date, truncToFirstDay: boolean): Date {
+    const resultDate: Date = new Date(controlDate);
+    resultDate.setHours(0);
+    resultDate.setMinutes(0);
+    resultDate.setSeconds(0);
+    resultDate.setMilliseconds(0);
+
     if (truncToFirstDay) {
-      resultDate = resultDate.date(1);
+      resultDate.setDate(1);
     }
-    // const timeZoneDifference = (resultDate.getTimezoneOffset() / 60) * -1;
-    // resultDate.setTime(
-    //   resultDate.getTime() + timeZoneDifference * 60 * 60 * 1000
-    // );
+     const timeZoneDifference = (resultDate.getTimezoneOffset() / 60) * -1;
+     resultDate.setTime(
+       resultDate.getTime() + timeZoneDifference * 60 * 60 * 1000
+     );
 
     console.log(resultDate);
 
     return resultDate;
   }
-
-  toTimezoneZeroOffset(momentValue: Moment): Date {
-    const resultDate = momentValue.toDate();
-    const timeZoneDifference = (resultDate.getTimezoneOffset() / 60) * -1;
-    resultDate.setTime(
-      resultDate.getTime() + timeZoneDifference * 60 * 60 * 1000
-    );
-    return resultDate;
+  ngOnInit(): void {
+    if (this.filterOn.length > 0) {
+      this.selectedFilter = this.filterOn[0].value;
+      this.selectedFilterObj = this.filterOn[0];
+      this.truncToFirstDay = this.selectedFilterObj?.calendarStartView === 'multi-year'
+        ||  this.selectedFilterObj?.calendarStartView === 'year';
+    }
+    this.loadDatesFromStorage();
+    this.assignDatesToFormControls();
   }
-
   /**
    * Handler that is called when the year has been selected when there is shown a year/multiyear view.
-   * @param normalizedYear year from the moment
+   * @param normalizedYear year from the date
    * @param fc Form control to set the value on
    */
   chosenYearHandler(normalizedYear: Moment, fc: FormControl): void {
     if (fc === this.dateFrom) {
       console.log('update on from date for year');
     }
-    const ctrlValue = fc.value;
-    ctrlValue.year(normalizedYear.year());
+    const ctrlValue = new Date(fc.value);
+    ctrlValue.setFullYear(normalizedYear.toDate().getFullYear());
     fc.setValue(ctrlValue);
   }
 
   /**
    * Handler that is called when the month has been selected when there is shown a month view
-   * @param normalizedMonth month from the moment
+   * @param normalizedMonth month from the date
    * @param datepicker datepicker component reference
    * @param fc Form control to set value on
    */
   chosenMonthHandler(
     normalizedMonth: Moment,
-    datepicker: MatDatepicker<Moment>,
+    datepicker: MatDatepicker<Date>,
     fc: FormControl
   ): void {
-    const ctrlValue = fc.value;
-    ctrlValue.month(normalizedMonth.month());
+    const ctrlValue = new Date(fc.value);
+    ctrlValue.setMonth(normalizedMonth.toDate().getMonth());
     fc.setValue(ctrlValue);
     datepicker.close();
     if (fc === this.dateFrom) {
@@ -166,66 +150,67 @@ export class DatepickerRangeComponent implements OnInit {
     trgtControl: FormControl,
     syncTrgt: boolean
   ): void {
-    const normalizedSrcDate = DatepickerRangeComponent.getDateFromControl(srcControl, this.truncToFirstDay);
-    const normalizedTrgtDate = DatepickerRangeComponent.getDateFromControl(trgtControl, this.truncToFirstDay);
+    const normalizedSrcDate = DatepickerRangeComponent.normalizeDateFromControl(srcControl.value, this.truncToFirstDay);
+    const normalizedTrgtDate = DatepickerRangeComponent.normalizeDateFromControl(trgtControl.value, this.truncToFirstDay);
     console.log(`Source control: ${normalizedSrcDate}`);
     console.log(`Target control: ${normalizedTrgtDate}`);
 
     // put the controls always on the normalized date, to have the visual correct value.
-    const srcValue = srcControl.value;
-    srcValue.set(normalizedSrcDate.toObject());
-    const trgtValue = trgtControl.value;
-    trgtValue.set(normalizedTrgtDate.toObject());
+    srcControl.setValue(normalizedSrcDate);
+    trgtControl.setValue(normalizedTrgtDate);
 
     if (normalizedSrcDate > normalizedTrgtDate) {
       console.log('src > trgt');
       if (syncTrgt) {
         if (this.isValidDate(srcControl)) {
           console.log('sync target');
-          trgtValue.set(normalizedSrcDate.toObject());
-          trgtControl.setValue(trgtValue);
+          trgtControl.setValue(new Date(normalizedSrcDate));
         }
       } else {
         if (this.isValidDate(trgtControl)) {
-          srcValue.set(normalizedTrgtDate.toObject());
-          srcControl.setValue(srcValue);
+          srcControl.setValue(new Date(normalizedTrgtDate));
         }
       }
     }
     if (this.isValidDate(srcControl) && this.isValidDate(trgtControl)) {
-      this.storeDatesToStorage();
+      const configItems = this.loadDatesFromStorage();
+      this.storeDatesToStorage(configItems);
     }
   }
 
   /**
    * Checks that the date that is entered is a valid date between certain boundaries
-   * @param control Form control with moment value, that needs to be validated
+   * @param control Form control with date value, that needs to be validated
    */
   isValidDate(control: FormControl): boolean {
-    const validStartDate = moment('01/01/1900', 'DD/MM/YYYY');
-    const validEndDate = moment('01/01/2099', 'DD/MM/YYYY');
+    const validStartDate = new Date(1900, 1, 1);
+    const validEndDate = new Date(2099, 1, 1);
 
-    return control.value.isBetween(validStartDate, validEndDate);
+    return control.value >= validStartDate && control.value <= validEndDate;
   }
 
 
   /**
    * Retrieve existing config from the session storage and add/update the config for the component name.
    */
-  storeDatesToStorage(): void {
-    const configItems = this.loadDatesFromStorage();
+  storeDatesToStorage(configItems: Map<string, DatepickerRangeConfig>): void {
     if (!this.selectedFilterObj) {
       return;
     }
 
     configItems.set(this.selectedFilterObj.value,
-      {
-        dateFrom: this.toTimezoneZeroOffset(DatepickerRangeComponent.getDateFromControl(this.dateFrom, this.truncToFirstDay)),
-        dateTo: this.toTimezoneZeroOffset(DatepickerRangeComponent.getDateFromControl(this.dateTo, this.truncToFirstDay))
-      }
+      this.getValuesOfFilter()
     );
     const configItemsStorageJson = JSON.stringify(Object.fromEntries(configItems));
     sessionStorage.setItem(`date-range-config-${this.srcComponentName}`, configItemsStorageJson);
+  }
+
+  private getValuesOfFilter() {
+    return {
+      dateFrom: DatepickerRangeComponent.normalizeDateFromControl(this.dateFrom.value, this.truncToFirstDay),
+      dateTo: DatepickerRangeComponent.normalizeDateFromControl(this.dateTo.value, this.truncToFirstDay),
+      filterValue: this.selectedFilter
+    };
   }
 
   loadDatesFromStorage():
@@ -247,22 +232,28 @@ export class DatepickerRangeComponent implements OnInit {
     }
     if (confItems.has(this.selectedFilterObj.value)) {
       const filterItem = confItems.get(this.selectedFilterObj.value);
-      this.dateFrom.setValue(moment(filterItem?.dateFrom));
-      this.dateTo.setValue(moment(filterItem?.dateTo));
+      this.dateFrom.setValue(filterItem?.dateFrom);
+      this.dateTo.setValue(filterItem?.dateTo);
   } else {
-      this.dateFrom.setValue(moment(new Date()));
-      this.dateTo.setValue(moment(new Date()));
+      const normalizedDate = DatepickerRangeComponent.normalizeDateFromControl(new Date(), this.truncToFirstDay);
+      this.dateFrom.setValue(normalizedDate);
+      this.dateTo.setValue(normalizedDate);
     }
   }
-  ngOnInit(): void {
-     if (this.filterOn.length > 0) {
-       this.selectedFilter = this.filterOn[0].value;
-       this.selectedFilterObj = this.filterOn[0];
-       this.truncToFirstDay = this.selectedFilterObj?.calendarStartView === 'multi-year'
-         ||  this.selectedFilterObj?.calendarStartView === 'year';
-     }
-    this.loadDatesFromStorage();
-    this.assignDatesToFormControls();
 
+  emitDateFiltering() {
+    const configItems = this.loadDatesFromStorage();
+    let item: DatepickerRangeConfig | undefined;
+    if (this.selectedFilterObj) {
+      if (configItems.has(this.selectedFilterObj.value)) {
+       item = configItems.get(this.selectedFilterObj.value);
+      } else {
+        // in case the user did not touch the dates ans therefor there is nothing in the sessionstorage
+        item = this.getValuesOfFilter();
+      }
+    }
+    if (item) {
+      this.newDateRangeEvent.emit(item);
+    }
   }
 }

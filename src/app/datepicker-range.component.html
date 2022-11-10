@@ -1,4 +1,4 @@
-<mat-form-field *ngIf="filterOn.length > 1">
+<div><mat-form-field class="filter-on" *ngIf="filterOn.length > 1">
   <mat-label>Filter on:</mat-label>
   <mat-select [(value)]="selectedFilter" (selectionChange)="onFilterOnChange($event)">
     <mat-option [value]="filter.value" *ngFor="let filter of filterOn" >
@@ -20,7 +20,7 @@
     startView="{{ this.selectedFilterObj.calendarStartView }}"
     (yearSelected)="chosenYearHandler($event, dateFrom)"
     (monthSelected)="chosenMonthHandler($event, dpFrom, dateFrom)"
-    panelClass="example-month-picker"
+    panelClass="month-picker"
   >
   </mat-datepicker>
 </mat-form-field>
@@ -38,9 +38,13 @@
     startView="{{ this.selectedFilterObj.calendarStartView }}"
     (yearSelected)="chosenYearHandler($event, dateTo)"
     (monthSelected)="chosenMonthHandler($event, dpTo, dateTo)"
-    panelClass="example-month-picker"
+    panelClass="month-picker"
   >
   </mat-datepicker>
 </mat-form-field>
-
+<button mat-raised-button
+  (click)="emitDateFiltering()">
+  Filter
+</button>
+</div>
 
